@@ -1,0 +1,174 @@
+Spec Requirements
+
+
+Config File
+
+
+
+	- Modes
+		- Test 
+			- Application does not actually save data.
+			- In Memory Only
+		- Prod
+			- Data is saved to disk
+			- Filename: Orders_MMDDYYYY.txt
+
+Order 
+	- Properties
+		- Order Number
+		- Customer Name
+		- State
+		- Tax Rate
+		- Product Type
+			- Info can be found in the ./Data/Products.txt
+		- Area
+		- Cost Per Sq. Ft.
+		- Labor Cost Per Sq. Ft.
+		- Material Cost
+		- Labor Cost
+		- Tax
+			- Info can be found in the ./Data/Taxes.txt
+		- Total
+
+	- Validation Items
+		- Customer State && Product Type entered by a user must match the items from the data files.
+			- Read from data files in both prod and test modes.
+UI
+	- Menu Selection
+		- DisplayOrders
+			- Input ( from User )
+				- Date
+			- Output ( to User )
+				- Display All Orders from the given date.
+			- No Orders Found
+				- Display Error
+				- Return to Selection Menu
+
+		- AddOrder
+			- Input ( from User )
+				- Each of the Order Properties
+					- Customer Name
+					- State
+						- TODO -tolower on string comparison
+					- Tax Rate
+					- Product Type
+						- Info can be found (and validated against) in the .\Data\Products.txt
+					- Area
+					- Cost Per Sq. Ft.
+					- Labor Cost Per Sq. Ft.
+					- Matterial Cost
+					- Labor Cost
+					- Tax
+						- Info can be found (and validated against) in the .\Data\Taxes.txt
+					- Total
+
+			- Output ( to User )
+				- Order Summary as text
+					- Require User to commit changes? ( yes / no )
+						- Yes: Data is written to orders list.
+						- No: Discard && Return to Menu Selection
+
+			- Additional Note: Order Number Must be Auto Generated
+				- Using the next available ID from the !!!Data File!!!
+				- Orders are 1 indexed.
+
+		- EditOrder
+			- Input ( from User )
+				- Order Number
+				- Date
+			- Validation
+				 - If an order with the given number and date exists
+				 	- Input ( from User )
+						- Each of the Order Properties: Print Existing Value and Receive Input from user for the new value.
+
+							*** BLANK INPUT MEANS KEEP EXISTING VALUE ***
+
+							- Customer Name
+							- State
+							- Tax Rate
+							- Product Type
+								- Info can be found in the ./Data/Products.txt
+							- Area
+							- Cost Per Sq. Ft.
+							- Labor Cost Per Sq. Ft.
+							- Material Cost
+							- Labor Cost
+							- Tax
+								- Info can be found in the ./Data/Taxes.txt
+							- Total
+
+			 	- Else
+			 		- NOT SPECIFIED
+			 			-> YOLO
+
+		- RemoveOrder
+			- Input ( from User )
+				- Order Number
+				- Date				
+			- Validation
+				 - If an order with the given number and date exists
+				 	- Input ( from User )
+						- Are You sure you want to remove this order?
+							- Yes
+								-> Remove								
+							- No
+								-> Do Not Remove
+				- Invalid Data Entered
+					- Loop until they enter valid date
+						- Note: this is a terrible design as it traps the user.
+							- Maybe they can guess a valid id / date combo... Maybe :)
+
+		- SaveChanges
+			- Input : NA
+			- Output : NA
+			- Logic -> Saves to Filesystem ( or memory depending on the mode )
+
+- DAO
+	File Paths:
+		./Data/Products.txt
+		./Data/Taxes.txt
+		./Config.txt
+		- Orders Filename: Orders_MMDDYYYY.txt
+
+	- From Filesystem
+		- Existing Order Data
+			- Using the Order Filename.
+
+
+INFERRED LOGIC:
+	- Each Order file is to be saved seperately based on its date.
+		- That is to say all the orders from 12242015 ( parsed = 12-24-2015) will be stored in the same file.
+		- Each Date that has a Order will have a file with that date as part of the filename
+	- The date will be part of the way we READ the file ... as we will construct the filepath using the date.
+		- If no file is founds, there were no orders on that date
+		- If the file is found, that file will contain entries from orders on that date
+
+NOTES:
+	- Enterprise Archatecture
+		- Proper Object Modeling
+
+	- Model Package
+		- Classes MUST have Class level Properties
+		- Classes MUST NOT have Methods
+
+	- Data Package
+		- Mode Driven Operations
+			- Test
+				- Classes must READ AND WRITE data to MEMORY.
+			- Prod
+				- Classes must READ AND WRITE data to FILESYSTEM.
+
+	- Controller Package
+		- Classes that drives the flow of the application
+			- Meaning: Where the menu loops are stored.
+		- Classes that Perform business logic
+			- Meaning: 
+				- Passing info to the UI
+					- For instance: Through the ConsoleIO.print().
+				- Data Interacation
+				- Validation
+				- Interaction with DTO.
+					- Model
+				- Interaction with DAO.
+					- Interface
+					- Interface Implementation
